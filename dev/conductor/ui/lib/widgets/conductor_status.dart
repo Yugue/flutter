@@ -6,8 +6,6 @@ import 'package:conductor_core/conductor_core.dart';
 import 'package:conductor_core/proto.dart' as pb;
 import 'package:flutter/material.dart';
 
-import '../../../../../packages/flutter/lib/material.dart';
-
 /// Display the current conductor state
 class ConductorStatus extends StatefulWidget {
   const ConductorStatus({
