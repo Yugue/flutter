@@ -25,9 +25,13 @@ Future<void> main() async {
     throw Exception('The conductor only supports MacOS and Linux desktop');
   }
   final File _stateFile = _fs.file(_stateFilePath);
-  final pb.ConductorState? state =
-      _stateFile.existsSync() ? readStateFromFile(_stateFile) : null;
+  // final pb.ConductorState? state =
+  //     _stateFile.existsSync() ? readStateFromFile(_stateFile) : null;
 
+  const String channelName = 'dev';
+  final pb.ConductorState state = pb.ConductorState(
+    releaseChannel: channelName,
+  );
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp(state));
 }

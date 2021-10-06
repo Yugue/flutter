@@ -6,6 +6,8 @@ import 'package:conductor_core/conductor_core.dart';
 import 'package:conductor_core/proto.dart' as pb;
 import 'package:flutter/material.dart';
 
+import '../../../../../packages/flutter/lib/material.dart';
+
 /// Display the current conductor state
 class ConductorStatus extends StatefulWidget {
   const ConductorStatus({
@@ -22,8 +24,15 @@ class ConductorStatus extends StatefulWidget {
 }
 
 class ConductorStatusState extends State<ConductorStatus> {
+
   @override
   Widget build(BuildContext context) {
+    // return Column(
+    //   children: <Widget>[
+    //     const Text(
+    //         presentStateDesktop(widget.releaseState!).engineCandidateBranch),
+    //   ],
+    // );
     return SelectableText(
       widget.releaseState != null
           ? presentState(widget.releaseState!)
