@@ -28,10 +28,49 @@ Future<void> main() async {
   // final pb.ConductorState? state =
   //     _stateFile.existsSync() ? readStateFromFile(_stateFile) : null;
 
-  const String channelName = 'dev';
-  final pb.ConductorState state = pb.ConductorState(
-    releaseChannel: channelName,
+  const String userName = 'flutterer';
+  const String releaseChannel = 'beta';
+  const String releaseVersion = '1.2.0-3.4.pre';
+  const String candidateBranch = 'flutter-1.2-candidate.3';
+  const String workingBranch = 'cherrypicks-$candidateBranch';
+  const String dartRevision = 'fe9708ab688dcda9923f584ba370a66fcbc3811f';
+  const String engineCherrypick1 = 'a5a25cd702b062c24b2c67b8d30b5cb33e0ef6f0';
+  const String engineCherrypick2 = '94d06a2e1d01a3b0c693b94d70c5e1df9d78d249';
+  const String frameworkCherrypick = 'a5a25cd702b062c24b2c67b8d30b5cb33e0ef6f0';
+
+  final RegExp titlePattern = RegExp(r'&title=(.*)&');
+  final RegExp bodyPattern = RegExp(r'&body=(.*)$');
+
+  late pb.ConductorState state;
+
+  state = pb.ConductorState(
+    engine: pb.Repository(
+      candidateBranch: candidateBranch,
+      cherrypicks: <pb.Cherrypick>[
+        pb.Cherrypick(trunkRevision: engineCherrypick1),
+        pb.Cherrypick(trunkRevision: engineCherrypick2),
+      ],
+      dartRevision: dartRevision,
+      workingBranch: workingBranch,
+      startingGitHead: 'startingGitHead',
+      currentGitHead: 'currentGitHead',
+      checkoutPath: 'checkoutPath',
+    ),
+    framework: pb.Repository(
+      candidateBranch: candidateBranch,
+      cherrypicks: <pb.Cherrypick>[
+        pb.Cherrypick(trunkRevision: frameworkCherrypick),
+      ],
+      workingBranch: workingBranch,
+      startingGitHead: 'startingGitHead',
+      currentGitHead: 'currentGitHead',
+      checkoutPath: 'checkoutPath',
+    ),
+    conductorVersion: 'v1.0',
+    releaseChannel: releaseChannel,
+    releaseVersion: releaseVersion,
   );
+
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp(state));
 }
@@ -48,7 +87,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
-// TODO(Yugue): Add theming, https://github.com/flutter/flutter/issues/90982.
       home: Scaffold(
         appBar: AppBar(
           title: const Text(_title),
