@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 /// Displays all substeps related to the 1st step.
 ///
 /// Uses input fields and dropdowns to capture all the parameters of the conductor start command.
-class Step1Substeps extends StatefulWidget {
-  const Step1Substeps({
+class InitializeReleaseSubsteps extends StatefulWidget {
+  const InitializeReleaseSubsteps({
     Key? key,
     required this.nextStep,
   }) : super(key: key);
@@ -16,16 +16,16 @@ class Step1Substeps extends StatefulWidget {
   final VoidCallback nextStep;
 
   @override
-  Step1SubstepsState createState() => Step1SubstepsState();
+  InitializeReleaseSubstepsState createState() => InitializeReleaseSubstepsState();
 
   static const List<String> substepTitles = <String>[
     'Candidate Branch',
     'Release Channel',
     'Framework Mirror',
     'Engine Mirror',
-    'Engine Cherrypicks',
-    'Framework Cherrypicks',
-    'Dart Revision',
+    'Engine Cherrypicks (if necessary)',
+    'Framework Cherrypicks (if necessary)',
+    'Dart Revision (if necessary)',
     'Increment',
   ];
 
@@ -36,11 +36,10 @@ class Step1Substeps extends StatefulWidget {
   };
 }
 
-class Step1SubstepsState extends State<Step1Substeps> {
-  /// Updates the corresponding [field] in [Step1Substeps.releaseData] with [data].
+class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
+  /// Updates the corresponding [field] in [InitializeReleaseSubsteps.releaseData] with [data].
   void setReleaseData(String field, String data) {
-    setState(() => Step1Substeps.releaseData[field] = data);
-    print(Step1Substeps.releaseData);
+    setState(() => InitializeReleaseSubsteps.releaseData[field] = data);
   }
 
   @override
@@ -56,27 +55,27 @@ class Step1SubstepsState extends State<Step1Substeps> {
         CheckboxListTileDropdown(
           index: 1,
           setReleaseData: setReleaseData,
-          options: const <String>['-', 'stable', 'beta', 'dev'],
+          options: const <String>['-', 'dev', 'beta', 'stable'],
         ),
         CheckboxListTileInput(
           index: 2,
           setReleaseData: setReleaseData,
-          hintText: 'Framework repo mirror remote.',
+          hintText: "Git remote of the Conductor user's Framework repository mirror.",
         ),
         CheckboxListTileInput(
           index: 3,
           setReleaseData: setReleaseData,
-          hintText: 'Engine repo mirror remote.',
+          hintText: "Git remote of the Conductor user's Engine repository mirror.",
         ),
         CheckboxListTileInput(
           index: 4,
           setReleaseData: setReleaseData,
-          hintText: 'Engine cherrypick hashes to be applied. Multiple hashes delimited by a coma, no spaces',
+          hintText: 'Engine cherrypick hashes to be applied. Multiple hashes delimited by a comma, no spaces.',
         ),
         CheckboxListTileInput(
           index: 5,
           setReleaseData: setReleaseData,
-          hintText: 'Framework cherrypick hashes to be applied. Multiple hashes delimited by a coma, no spaces',
+          hintText: 'Framework cherrypick hashes to be applied. Multiple hashes delimited by a comma, no spaces.',
         ),
         CheckboxListTileInput(
           index: 6,
@@ -86,12 +85,12 @@ class Step1SubstepsState extends State<Step1Substeps> {
         CheckboxListTileDropdown(
           index: 7,
           setReleaseData: setReleaseData,
-          options: const <String>['-', 'm', 'n', 'y', 'z'],
+          options: const <String>['-', 'y', 'z', 'm', 'n'],
         ),
         const SizedBox(height: 20.0),
         Center(
           // TODO(Yugue): Add regex validation for each parameter input
-          // when Continue button is pressed, https://github.com/flutter/flutter/issues/91925.
+          // before Continue button is enabled, https://github.com/flutter/flutter/issues/91925.
           child: ElevatedButton(
             key: const Key('step1continue'),
             onPressed: () {
@@ -107,7 +106,7 @@ class Step1SubstepsState extends State<Step1Substeps> {
 
 typedef SetReleaseData = void Function(String name, String data);
 
-/// Captures the input values and updates the corresponding field in [Step1Substeps.releaseData].
+/// Captures the input values and updates the corresponding field in [InitializeReleaseSubsteps.releaseData].
 class CheckboxListTileInput extends StatefulWidget {
   const CheckboxListTileInput({
     Key? key,
@@ -128,16 +127,17 @@ class CheckboxListTileInputState extends State<CheckboxListTileInput> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: Key(Step1Substeps.substepTitles[widget.index]),
-      decoration: InputDecoration(labelText: Step1Substeps.substepTitles[widget.index], hintText: widget.hintText),
+      key: Key(InitializeReleaseSubsteps.substepTitles[widget.index]),
+      decoration:
+          InputDecoration(labelText: InitializeReleaseSubsteps.substepTitles[widget.index], hintText: widget.hintText),
       onChanged: (String data) {
-        widget.setReleaseData(Step1Substeps.substepTitles[widget.index], data);
+        widget.setReleaseData(InitializeReleaseSubsteps.substepTitles[widget.index], data);
       },
     );
   }
 }
 
-/// Captures the chosen option and updates the corresponding field in [Step1Substeps.releaseData].
+/// Captures the chosen option and updates the corresponding field in [InitializeReleaseSubsteps.releaseData].
 class CheckboxListTileDropdown extends StatefulWidget {
   const CheckboxListTileDropdown({
     Key? key,
@@ -160,13 +160,13 @@ class CheckboxListTileDropdownState extends State<CheckboxListTileDropdown> {
     return Row(
       children: <Widget>[
         Text(
-          Step1Substeps.substepTitles[widget.index],
+          InitializeReleaseSubsteps.substepTitles[widget.index],
           style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700]),
         ),
         const SizedBox(width: 20.0),
         DropdownButton<String>(
-          key: Key(Step1Substeps.substepTitles[widget.index]),
-          value: Step1Substeps.releaseData[Step1Substeps.substepTitles[widget.index]],
+          key: Key(InitializeReleaseSubsteps.substepTitles[widget.index]),
+          value: InitializeReleaseSubsteps.releaseData[InitializeReleaseSubsteps.substepTitles[widget.index]],
           icon: const Icon(Icons.arrow_downward),
           items: widget.options.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
@@ -175,7 +175,7 @@ class CheckboxListTileDropdownState extends State<CheckboxListTileDropdown> {
             );
           }).toList(),
           onChanged: (String? newValue) {
-            widget.setReleaseData(Step1Substeps.substepTitles[widget.index], newValue!);
+            widget.setReleaseData(InitializeReleaseSubsteps.substepTitles[widget.index], newValue!);
           },
         ),
       ],

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:conductor_ui/widgets/step1_substeps.dart';
+import 'package:conductor_ui/widgets/initialize_release_substeps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,7 +24,7 @@ void main() {
             home: Material(
               child: ListView(
                 children: <Widget>[
-                  Step1Substeps(
+                  InitializeReleaseSubsteps(
                     nextStep: () {},
                   ),
                 ],
@@ -40,35 +40,35 @@ void main() {
     /// Tests the Release Channel dropdown menu.
     await tester.tap(find.byKey(const Key('Release Channel')));
     await tester.pump(const Duration(seconds: 1)); // finish the menu animation
-    expect(Step1Substeps.releaseData['Release Channel'], equals('-'));
+    expect(InitializeReleaseSubsteps.releaseData['Release Channel'], equals('-'));
     await tester.tap(find.text(releaseChannel).last);
     await tester.pump(const Duration(seconds: 1)); // finish the menu animation
 
     await tester.enterText(find.byKey(const Key('Framework Mirror')), frameworkMirror);
     await tester.enterText(find.byKey(const Key('Engine Mirror')), engineMirror);
-    await tester.enterText(find.byKey(const Key('Engine Cherrypicks')), engineCherrypick);
-    await tester.enterText(find.byKey(const Key('Framework Cherrypicks')), frameworkCherrypick);
-    await tester.enterText(find.byKey(const Key('Dart Revision')), dartRevision);
+    await tester.enterText(find.byKey(const Key('Engine Cherrypicks (if necessary)')), engineCherrypick);
+    await tester.enterText(find.byKey(const Key('Framework Cherrypicks (if necessary)')), frameworkCherrypick);
+    await tester.enterText(find.byKey(const Key('Dart Revision (if necessary)')), dartRevision);
 
     /// Tests the Increment dropdown menu.
     await tester.tap(find.byKey(const Key('Increment')));
     await tester.pump(const Duration(seconds: 1)); // finish the menu animation
-    expect(Step1Substeps.releaseData['Increment'], equals('-'));
+    expect(InitializeReleaseSubsteps.releaseData['Increment'], equals('-'));
     await tester.tap(find.text(increment).last);
     await tester.pump(const Duration(seconds: 1)); // finish the menu animation
 
     await tester.pumpAndSettle();
 
     expect(
-        Step1Substeps.releaseData,
+        InitializeReleaseSubsteps.releaseData,
         equals(<String, String>{
           'Candidate Branch': candidateBranch,
           'Release Channel': releaseChannel,
           'Framework Mirror': frameworkMirror,
           'Engine Mirror': engineMirror,
-          'Engine Cherrypicks': engineCherrypick,
-          'Framework Cherrypicks': frameworkCherrypick,
-          'Dart Revision': dartRevision,
+          'Engine Cherrypicks (if necessary)': engineCherrypick,
+          'Framework Cherrypicks (if necessary)': frameworkCherrypick,
+          'Dart Revision (if necessary)': dartRevision,
           'Increment': increment,
         }));
   });
