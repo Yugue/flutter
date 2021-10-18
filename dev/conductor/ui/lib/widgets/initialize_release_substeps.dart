@@ -30,16 +30,29 @@ class InitializeReleaseSubsteps extends StatefulWidget {
   ];
 
   /// Default values of release initialization parameters.
-  static Map<String, String?> releaseData = <String, String?>{
+  static const Map<String, String?> releaseDataDefault = <String, String?>{
     'Release Channel': '-',
     'Increment': '-',
   };
 }
 
 class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
-  /// Updates the corresponding [field] in [InitializeReleaseSubsteps.releaseData] with [data].
+  late Map<String, String?> _releaseData;
+
+  @override
+  void initState() {
+    super.initState();
+    _releaseData = InitializeReleaseSubsteps.releaseDataDefault;
+  }
+
+  /// Updates the corresponding [field] in [_releaseData] with [data].
   void setReleaseData(String field, String data) {
-    setState(() => InitializeReleaseSubsteps.releaseData[field] = data);
+    setState(() {
+      _releaseData = <String, String?>{
+        ..._releaseData,
+        field: data,
+      };
+    });
   }
 
   @override
@@ -47,43 +60,45 @@ class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 0,
           setReleaseData: setReleaseData,
           hintText: 'The candidate branch the release will be based on.',
         ),
         CheckboxListTileDropdown(
           index: 1,
+          releaseData: _releaseData,
           setReleaseData: setReleaseData,
           options: const <String>['-', 'dev', 'beta', 'stable'],
         ),
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 2,
           setReleaseData: setReleaseData,
           hintText: "Git remote of the Conductor user's Framework repository mirror.",
         ),
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 3,
           setReleaseData: setReleaseData,
           hintText: "Git remote of the Conductor user's Engine repository mirror.",
         ),
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 4,
           setReleaseData: setReleaseData,
           hintText: 'Engine cherrypick hashes to be applied. Multiple hashes delimited by a comma, no spaces.',
         ),
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 5,
           setReleaseData: setReleaseData,
           hintText: 'Framework cherrypick hashes to be applied. Multiple hashes delimited by a comma, no spaces.',
         ),
-        CheckboxListTileInput(
+        InputAsSubstep(
           index: 6,
           setReleaseData: setReleaseData,
           hintText: 'New Dart revision to cherrypick.',
         ),
         CheckboxListTileDropdown(
           index: 7,
+          releaseData: _releaseData,
           setReleaseData: setReleaseData,
           options: const <String>['-', 'y', 'z', 'm', 'n'],
         ),
@@ -106,9 +121,9 @@ class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
 
 typedef SetReleaseData = void Function(String name, String data);
 
-/// Captures the input values and updates the corresponding field in [InitializeReleaseSubsteps.releaseData].
-class CheckboxListTileInput extends StatefulWidget {
-  const CheckboxListTileInput({
+/// Captures the input values and updates the corresponding field in [_releaseData].
+class InputAsSubstep extends StatelessWidget {
+  const InputAsSubstep({
     Key? key,
     required this.index,
     required this.setReleaseData,
@@ -120,62 +135,53 @@ class CheckboxListTileInput extends StatefulWidget {
   final String? hintText;
 
   @override
-  CheckboxListTileInputState createState() => CheckboxListTileInputState();
-}
-
-class CheckboxListTileInputState extends State<CheckboxListTileInput> {
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      key: Key(InitializeReleaseSubsteps.substepTitles[widget.index]),
-      decoration:
-          InputDecoration(labelText: InitializeReleaseSubsteps.substepTitles[widget.index], hintText: widget.hintText),
+      key: Key(InitializeReleaseSubsteps.substepTitles[index]),
+      decoration: InputDecoration(labelText: InitializeReleaseSubsteps.substepTitles[index], hintText: hintText),
       onChanged: (String data) {
-        widget.setReleaseData(InitializeReleaseSubsteps.substepTitles[widget.index], data);
+        setReleaseData(InitializeReleaseSubsteps.substepTitles[index], data);
       },
     );
   }
 }
 
-/// Captures the chosen option and updates the corresponding field in [InitializeReleaseSubsteps.releaseData].
-class CheckboxListTileDropdown extends StatefulWidget {
+/// Captures the chosen option and updates the corresponding field in [_releaseData].
+class CheckboxListTileDropdown extends StatelessWidget {
   const CheckboxListTileDropdown({
     Key? key,
     required this.index,
+    required this.releaseData,
     required this.setReleaseData,
     required this.options,
   }) : super(key: key);
 
   final int index;
+  final Map<String, String?> releaseData;
   final SetReleaseData setReleaseData;
   final List<String> options;
 
-  @override
-  CheckboxListTileDropdownState createState() => CheckboxListTileDropdownState();
-}
-
-class CheckboxListTileDropdownState extends State<CheckboxListTileDropdown> {
   @override
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
         Text(
-          InitializeReleaseSubsteps.substepTitles[widget.index],
+          InitializeReleaseSubsteps.substepTitles[index],
           style: Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey[700]),
         ),
         const SizedBox(width: 20.0),
         DropdownButton<String>(
-          key: Key(InitializeReleaseSubsteps.substepTitles[widget.index]),
-          value: InitializeReleaseSubsteps.releaseData[InitializeReleaseSubsteps.substepTitles[widget.index]],
+          key: Key(InitializeReleaseSubsteps.substepTitles[index]),
+          value: releaseData[InitializeReleaseSubsteps.substepTitles[index]],
           icon: const Icon(Icons.arrow_downward),
-          items: widget.options.map<DropdownMenuItem<String>>((String value) {
+          items: options.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(value),
             );
           }).toList(),
           onChanged: (String? newValue) {
-            widget.setReleaseData(InitializeReleaseSubsteps.substepTitles[widget.index], newValue!);
+            setReleaseData(InitializeReleaseSubsteps.substepTitles[index], newValue!);
           },
         ),
       ],
