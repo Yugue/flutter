@@ -27,6 +27,10 @@ Future<void> main() async {
   final File _stateFile = _fs.file(_stateFilePath);
   final pb.ConductorState? state = _stateFile.existsSync() ? readStateFromFile(_stateFile) : null;
 
+  final io.Directory directory =
+      await io.Directory('/Users/alexcn/flutter_conductor_checkouts').create(recursive: true);
+  print(directory.path);
+
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp(state));
 }

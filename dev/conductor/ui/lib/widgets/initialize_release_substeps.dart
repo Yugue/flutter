@@ -2,7 +2,36 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io' as io;
+
+import 'package:conductor_core/conductor_core.dart';
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:flutter/material.dart';
+import 'package:platform/platform.dart';
+import 'package:process/process.dart';
+
+@override
+class Checkouts {
+  Checkouts({
+    required this.fileSystem,
+    required this.platform,
+    required this.processManager,
+    required this.stdio,
+    required Directory parentDirectory,
+    String directoryName = 'flutter_conductor_checkouts',
+  }) : directory = parentDirectory.childDirectory(directoryName) {
+    if (!directory.existsSync()) {
+      directory.createSync(recursive: true);
+    }
+  }
+
+  final Directory directory;
+  final FileSystem fileSystem;
+  final Platform platform;
+  final ProcessManager processManager;
+  final Stdio stdio;
+}
 
 /// Displays all substeps related to the 1st step.
 ///
@@ -38,11 +67,47 @@ class InitializeReleaseSubsteps extends StatefulWidget {
 
 class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
   late Map<String, String?> _releaseData;
+  late StartContext startContext;
 
   @override
   void initState() {
     super.initState();
     _releaseData = InitializeReleaseSubsteps.releaseDataDefault;
+
+    const FileSystem fileSystem = LocalFileSystem();
+    const ProcessManager processManager = LocalProcessManager();
+    const Platform platform = LocalPlatform();
+    final Stdio stdio = VerboseStdio(
+      stdout: io.stdout,
+      stderr: io.stderr,
+      stdin: io.stdin,
+    );
+    final Checkouts checkouts = Checkouts(
+      fileSystem: fileSystem,
+      parentDirectory: localFlutterRoot.parent,
+      platform: platform,
+      processManager: processManager,
+      stdio: stdio,
+    );
+    // final String _stateFilePath = defaultStateFilePath(platform);
+    // final File _stateFile = fileSystem.file(_stateFilePath);
+    // final StartContext startContext = StartContext(
+    //   candidateBranch: _releaseData['Candidate Branch']!,
+    //   checkouts: checkouts,
+    //   dartRevision: _releaseData['Dart Revision (if necessary)'],
+    //   engineCherrypickRevisions: _releaseData['Engine Cherrypicks (if necessary)']!.split(','),
+    //   engineMirror: _releaseData['Engine Mirror']!,
+    //   engineUpstream: EngineRepository.defaultUpstream,
+    //   flutterRoot: localFlutterRoot,
+    //   frameworkCherrypickRevisions: _releaseData['Framework Cherrypicks (if necessary)']!.split(','),
+    //   frameworkMirror: _releaseData['Framework Mirror']!,
+    //   frameworkUpstream: FrameworkRepository.defaultUpstream,
+    //   incrementLetter: _releaseData['Increment']!,
+    //   processManager: processManager,
+    //   releaseChannel: _releaseData['Release Channel']!,
+    //   stateFile: _stateFile,
+    //   stdio: stdio,
+    // );
   }
 
   /// Updates the corresponding [field] in [_releaseData] with [data].
@@ -108,7 +173,8 @@ class InitializeReleaseSubstepsState extends State<InitializeReleaseSubsteps> {
           // before Continue button is enabled, https://github.com/flutter/flutter/issues/91925.
           child: ElevatedButton(
             key: const Key('step1continue'),
-            onPressed: () {
+            onPressed: () async {
+              await startContext.run();
               widget.nextStep();
             },
             child: const Text('Continue'),
